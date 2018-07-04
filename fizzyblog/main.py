@@ -86,7 +86,7 @@ def process_posts(base_dir):
 		variables = {"tags": tags_dict.keys(), "lang": lang}
 		html_taglist = template.evaluate(template_taglist, globscope, variables)
 		path = f"{settings.dir_output}/{lang}/tags/index.html"
-		template.write(path, html_postlist)
+		template.write(path, html_taglist)
 
 		print("Writing posts lists by year")
 		for year, posts in years_dict:
@@ -99,7 +99,7 @@ def process_posts(base_dir):
 		variables = {"years": years_dict.keys(), "lang": lang}
 		html_yearlist = template.evaluate(template_yearlist, globscope, variables)
 		path = f"{settings.dir_output}/{lang}/years/index.html"
-		template.write(path, html_postlist)
+		template.write(path, html_yearlist)
 
 	# Step 3: evaluate, render and write to html output
 	print("Rendering all the posts")
