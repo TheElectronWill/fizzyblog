@@ -1,24 +1,11 @@
-import re
 from typing import Dict, Any, Mapping
 
+import re
 import markdown
-
-dir_input = "src"
-dir_input_posts = dir_input + "/posts"
-dir_input_pages = dir_input + "/pages"
-dir_input_static = dir_input + "/static"
-
-dir_output = "out"
-dir_output_static = dir_output + "/static"
-
-extensions = ["markdown.extensions.meta",
-							"markdown.extensions.extra",
-							"mdx_math"]
-
-defaultLang = "en"
+import settings
 
 __reg = re.compile("\\${.*?}", re.DOTALL)
-__markdown = markdown.Markdown(extensions=extensions, output_format="html5")
+__markdown = markdown.Markdown(extensions=settings.extensions, output_format="html5")
 
 def evaluate(data: str, globals: Dict[str, Any]=globals(), locals: Mapping[str, Any]=locals()) -> (str, int):
 	"""
@@ -30,7 +17,7 @@ def evaluate(data: str, globals: Dict[str, Any]=globals(), locals: Mapping[str, 
 	"""
 	return __reg.subn(lambda x: str(eval(x.group()[2:-1], globals, locals)), data)
 
-def render_markdown(md: str) -> str:
+def render(md: str) -> str:
 	"""
 	Renders markdown to HTML
 	:param md: the markdown source
@@ -38,7 +25,7 @@ def render_markdown(md: str) -> str:
 	"""
 	return __markdown.reset().convert(md)
 
-def read_file(f: str) -> str:
+def read(f: str) -> str:
 	"""
 	Reads a text file to a string
 	:param f: the file's path
@@ -53,4 +40,6 @@ def read_doc(f: str) -> (str, str):
 	:param f: the file's path
 	:return: (header, remaining document)
 	"""
-	return read_file(f).split("\n---\n", maxsplit=1)
+	return read(f).split("\n---\n", maxsplit=1)
+
+

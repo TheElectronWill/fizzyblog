@@ -1,10 +1,10 @@
 from setuptools import setup
 
 setup(
-	name='Just blog!',
+	name='fizzyblog',
 	version='1.0',
-	packages=[],
-	url='https://github.com/TheElectronWill/just-blog',
+	packages=['fizzyblog'],
+	url='https://github.com/TheElectronWill/fizzyblog',
 	license='GPLv3',
 	author='TheElectronWill',
 	description='Blog engine in python',
