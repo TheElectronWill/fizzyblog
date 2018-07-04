@@ -3,6 +3,7 @@ import template
 import blog
 import os
 import genhtml
+import datetime
 
 class InvalidFileException(Exception):
   def __init__(self, msg):

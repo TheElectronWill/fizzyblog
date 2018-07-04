@@ -1,7 +1,7 @@
 import template
 import genmarkdown
 import settings
-import datetime.strptime
+import datetime
 
 class BlogFile:
   def __init__(self, lang, name, content, parent_dirname):
@@ -29,19 +29,19 @@ class BlogFile:
     # global scope (completed by subclasses):
     self.globscope = {"datetime":datetime, "template_each":template.template_each}
     
-  def setlangs(langs):
+  def setlangs(self, langs):
     self.langs = langs
     self.variables["langs"] = langs
     
-  def evaluate():
+  def evaluate(self):
     self.content, count = template.evaluate(self.content, self.globscope, self.variables)
     return count
     
-  def render():
+  def render(self):
     """Renders the markdown as HTML. This method replaces the 'content' variable."""
     self.content = template.render(self.content)
   
-  def write_final():
+  def write_final(self):
     path = f"{settings.dir_output}/{self.lang}/{self.parent_dirname}/{self.url}"
     with open(path, "w") as file:
       file.write(self.content)
@@ -54,7 +54,7 @@ class Post(BlogFile):
     self.globscope = {**self.globscope, "Post":Post, **genmarkdown.__dict__}
     exec(header, self.globscope, self.variables)
     # calculate datetime:
-    self.datetime = strptime(self.variables["date"])
+    self.datetime = datetime.strptime(self.variables["date"], "")
     self.variables["datetime"] = self.datetime
     # ref to important variables:
     self.title = self.variables["title"]
@@ -62,11 +62,11 @@ class Post(BlogFile):
     assert isinstance(self.title, str)
     assert isinstance(self.tags, list)
   
-  def setnext(post):
+  def setnext(self, post):
     self.next = post
     self.variables["next"] = post
   
-  def setprev(post):
+  def setprev(self, post):
     self.prev = post
     self.variables["prev"] = post
 

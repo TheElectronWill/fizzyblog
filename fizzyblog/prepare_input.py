@@ -12,7 +12,7 @@ def touch(path):
 if __name__ == "__main__":
   wd=os.getcwd()
   mkdir(settings.dir_input)
-  chdir(settings.dir_input)
+  os.chdir(settings.dir_input)
   
   mkdir("posts")
   touch("posts/hello.md")

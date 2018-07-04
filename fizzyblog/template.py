@@ -46,17 +46,19 @@ def read_doc(f: str) -> (str, str):
 	return read(f).split("\n---\n", maxsplit=1)
 
 def write(f: str, data: str):
-  with open(f, 'w') as file:
-    file.write(data)
+	with open(f, 'w') as file:
+		file.write(data)
+
 
 def template_each(l: Iterable, template_name: str, vname="element") -> str:
-  if not template.endswith(".html"):
-    template += ".html"
-  template = read(f"{settings.dir_input}/templates/{template_name}")
-  globscope = {"datetime":datetime, "Post":blog.Post, "Page":blog.Page, **genhtml.__dict__, "template_each":template_each}
-  res = ""
-  for e in l:
-    variables = {vname:e}
-    html, count = evaluate(template, globscope, variables)
-    res += html
-  return res
+	if not template_name.endswith(".html"):
+		template_name += ".html"
+
+	template = read(f"{settings.dir_input}/templates/{template_name}")
+	globscope = {"datetime": datetime, "Post": blog.Post, "Page": blog.Page, **genhtml.__dict__, "template_each": template_each}
+	res = ""
+	for e in l:
+		variables = {vname: e}
+		html, count = evaluate(template, globscope, variables)
+		res += html
+	return res
