@@ -1,8 +1,11 @@
-from typing import Dict, Any, Mapping
+from typing import Iterable, Dict, Any, Mapping
 
 import re
 import markdown
 import settings
+import datetime
+import blog
+import genhtml
 
 __reg = re.compile("\\${.*?}", re.DOTALL)
 __markdown = markdown.Markdown(extensions=settings.extensions, output_format="html5")
@@ -42,6 +45,9 @@ def read_doc(f: str) -> (str, str):
 	"""
 	return read(f).split("\n---\n", maxsplit=1)
 
+def write(f: str, data: str):
+  with open(f, 'w') as file:
+    file.write(data)
 
 def template_each(l: Iterable, template_name: str, vname="element") -> str:
   if not template.endswith(".html"):
