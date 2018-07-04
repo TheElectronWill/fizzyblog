@@ -14,7 +14,7 @@ class InvalidFileException(Exception):
 
 def list_blog(directory):
 	for f in os.listdir(directory):
-		s = f.rsplit(".", max=2)
+		s = f.rsplit(".", maxsplit=2)
 		if len(s) == 1 or s[-1] != "md":
 			raise InvalidFileException("Posts and pages must have the .md extension")
 		elif len(s) == 2:
