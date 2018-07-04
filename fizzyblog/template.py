@@ -1,16 +1,17 @@
 from typing import Iterable, Dict, Any, Mapping
-
-import re
-import markdown
-import settings
 import datetime
-import blog
-import genhtml
+import markdown
+import re
+
+import fizzyblog.blog as blog
+import fizzyblog.genhtml as genhtml
+import fizzyblog.settings as settings
 
 __reg = re.compile("\\${.*?}", re.DOTALL)
 __markdown = markdown.Markdown(extensions=settings.extensions, output_format="html5")
 
-def evaluate(data: str, globals: Dict[str, Any]=globals(), locals: Mapping[str, Any]=locals()) -> (str, int):
+
+def evaluate(data: str, globals: Dict[str, Any] = globals(), locals: Mapping[str, Any] = locals()) -> (str, int):
 	"""
 	Evaluates all the ${expr} and replaces them by their result
 	:param data: the data to evaluate
@@ -20,6 +21,7 @@ def evaluate(data: str, globals: Dict[str, Any]=globals(), locals: Mapping[str, 
 	"""
 	return __reg.subn(lambda x: str(eval(x.group()[2:-1], globals, locals)), data)
 
+
 def render(md: str) -> str:
 	"""
 	Renders markdown to HTML
@@ -27,6 +29,7 @@ def render(md: str) -> str:
 	:return: the rendered HTML
 	"""
 	return __markdown.reset().convert(md)
+
 
 def read(f: str) -> str:
 	"""
@@ -37,6 +40,7 @@ def read(f: str) -> str:
 	with open(f, 'r') as file:
 		return file.read()
 
+
 def read_doc(f: str) -> (str, str):
 	"""
 	Reads a document with a header.
@@ -44,6 +48,7 @@ def read_doc(f: str) -> (str, str):
 	:return: (header, remaining document)
 	"""
 	return read(f).split("\n---\n", maxsplit=1)
+
 
 def write(f: str, data: str):
 	with open(f, 'w') as file:
@@ -55,7 +60,8 @@ def template_each(l: Iterable, template_name: str, vname="element") -> str:
 		template_name += ".html"
 
 	template = read(f"{settings.dir_input}/templates/{template_name}")
-	globscope = {"datetime": datetime, "Post": blog.Post, "Page": blog.Page, **genhtml.__dict__, "template_each": template_each}
+	globscope = {"datetime": datetime, "Post": blog.Post, "Page": blog.Page, **genhtml.__dict__,
+							 "template_each": template_each}
 	res = ""
 	for e in l:
 		variables = {vname: e}
