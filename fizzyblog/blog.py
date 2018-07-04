@@ -27,7 +27,7 @@ class BlogFile:
     self.variables["dir_static"] = "../../static"
     self.variables["home"] = "../../index.html"
     # global scope (completed by subclasses):
-    self.globscope = {"datetime":datetime}
+    self.globscope = {"datetime":datetime, "template_each":template.template_each}
     
   def setlangs(langs):
     self.langs = langs
