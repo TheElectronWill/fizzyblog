@@ -1,10 +1,6 @@
-import datetime
 import os
 
-import fizzyblog.blog as blog
-import fizzyblog.genhtml as genhtml
-import fizzyblog.settings as settings
-import fizzyblog.template as template
+from fizzyblog.blog import *
 
 
 class InvalidFileException(Exception):
@@ -18,25 +14,14 @@ def list_blog(directory):
 		if len(s) == 1 or s[-1] != "md":
 			raise InvalidFileException("Posts and pages must have the .md extension")
 		elif len(s) == 2:
-			lang = settings.defaultLang
+			lang = settings.default_lang
 		else:
 			lang = s[1]
 		name = s[0]
 		yield f, name, lang
 
 
-def getlist(dict, key):
-	v = dict[key]
-	if v is None:
-		v = []
-		dict[key] = v
-	return v
-
-
 def process_posts(base_dir):
-	template_postlist = template.read(f"{settings.dir_input}/templates/postlist.html")
-	template_taglist = template.read(f"{settings.dir_input}/templates/taglist.html")
-	template_yearlist = template.read(f"{settings.dir_input}/templates/yearlist.html")
 	langs_dict = {}  # posts by lang
 	posts_dict = {}  # langs by post
 	posts_dir = f"{settings.dir_input}/posts"
@@ -44,12 +29,14 @@ def process_posts(base_dir):
 	# Step 1: register all the posts
 	for f, name, lang in list_blog("."):
 		print(f"Registering {f} -> name='{name}', lang='{lang}'")
-		header, content = template.read_doc(f)
-		post = blog.Post(lang, name, header, content)
+		header, content = read_doc(f)
+		post = Post(lang, name, header, content)
 		getlist(langs_dict, lang).append(post)
 		getlist(posts_dict, name).append(lang)
+
 	# Step 2: link the posts with prev and next, call setlangs and generate posts lists
-	for lang, posts in langs_dict:
+	os.chdir(base_dir)
+	for lang, posts in langs_dict.items():
 		print(f"Linking posts for language {lang}")
 		posts.sort(key=lambda p: p.datetime, reverse=True)  # recent posts first
 		for i in range(0, len(posts) - 1):
@@ -68,44 +55,41 @@ def process_posts(base_dir):
 				getlist(tags_dict, tag).append(p)
 
 		print("Writing global posts list")
-		globscope = {"datetime": datetime, "Post": blog.Post, "Page": blog.Page, **genhtml.__dict__,
-								 "template_each": template.template_each}
 		variables = {"posts": posts, "lang": lang}
-		html_postlist = template.evaluate(template_postlist, globscope, variables)
+		html_postlist, c = evaluate(template_postlist, globals_html, variables)
 		path = f"{settings.dir_output}/{lang}/posts/index.html"
-		template.write(path, html_postlist)
+		write(path, html_postlist)
 
 		print("Writing posts lists by tag")
-		for tag, posts in tags_dict:
+		for tag, posts in tags_dict.items():
 			variables = {"posts": posts, "tag": tag, "lang": lang}
-			html_postlist = template.evaluate(template_postlist, globscope, variables)
+			html_postlist, c = evaluate(template_postlist, globals_html, variables)
 			path = f"{settings.dir_output}/{lang}/tags/{tag}.html"
-			template.write(path, html_postlist)
+			write(path, html_postlist)
 
 		print("Writing tags list")
 		variables = {"tags": tags_dict.keys(), "lang": lang}
-		html_taglist = template.evaluate(template_taglist, globscope, variables)
+		html_taglist, c = evaluate(template_taglist, globals_html, variables)
 		path = f"{settings.dir_output}/{lang}/tags/index.html"
-		template.write(path, html_taglist)
+		write(path, html_taglist)
 
 		print("Writing posts lists by year")
-		for year, posts in years_dict:
+		for year, posts in years_dict.items():
 			variables = {"posts": posts, "year": year, "lang": lang}
-			html_postlist = template.evaluate(template_postlist, globscope, variables)
+			html_postlist, c = evaluate(template_postlist, globals_html, variables)
 			path = f"{settings.dir_output}/{lang}/years/{year}.html"
-			template.write(path, html_postlist)
+			write(path, html_postlist)
 
 		print("Writing years list")
 		variables = {"years": years_dict.keys(), "lang": lang}
-		html_yearlist = template.evaluate(template_yearlist, globscope, variables)
+		html_yearlist, c = evaluate(template_yearlist, globals_html, variables)
 		path = f"{settings.dir_output}/{lang}/years/index.html"
-		template.write(path, html_yearlist)
+		write(path, html_yearlist)
 
 	# Step 3: evaluate, render and write to html output
 	print("Rendering all the posts")
-	os.chdir(base_dir)
 	count = 0
-	for lang, posts in langs_dict:
+	for lang, posts in langs_dict.items():
 		os.makedirs(f"{settings.dir_output}/{lang}/posts", exist_ok=True)
 		for post in posts:
 			post.evaluate()
@@ -122,17 +106,17 @@ def process_pages(base_dir):
 	os.chdir(pages_dir)
 	# Step 1: register all the pages by name and language
 	for f, name, lang in list_blog("."):
-		content = template.read(f)
-		page = blog.Page(lang, name, content)
+		content = read(f)
+		page = Page(lang, name, content)
 		getlist(langs_dict, lang).append(page)
 		getlist(pages_dict, name).append(lang)
 	# Step 3: call setlangs
-	for page, langs in pages_dict:
+	for page, langs in pages_dict.items():
 		page.setlangs(langs)
 	# Step 2: evaluate, render and write to html output
 	os.chdir(base_dir)
 	count = 0
-	for lang, pages in langs_dict:
+	for lang, pages in langs_dict.items():
 		os.makedirs(f"{settings.dir_output}/{lang}/pages", exist_ok=True)
 		for page in pages:
 			page.evaluate()

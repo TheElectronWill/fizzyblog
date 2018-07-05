@@ -10,23 +10,23 @@ def ol(l: list):
 
 
 def __list_html(l, ltype):
-	s = "<%s>" % ltype
+	s = f"<{ltype}>"
 	for elem in l:
-		s += "<li>%s</li>" % __list_str(elem, ltype)
-	s += "</%s>" % ltype
+		s += f"<li>{__list_str(elem, ltype)}</li>"
+	s += f"</{ltype}>"
 	return s
 
 
 def __list_str(elem, ltype):
-	if isinstance(elem, collections.Iterable):
+	if isinstance(elem, collections.Iterable) and not isinstance(elem, str):
 		return __list_html(elem, ltype)
 	else:
 		return str(elem)
 
 
 def img(url, alt):
-	return "<img src=\"%s\" alt=\"%s\">" % (url, alt)
+	return f"<img src=\"{url}\" alt=\"{alt}\">"
 
 
 def link(url, text):
-	return "<a href=\"%s\">%s</a>" % (url, text)
+	return f"<a href=\"{url}\">{text}</a>"
