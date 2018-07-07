@@ -10,11 +10,11 @@ def ol(l: list):
 
 
 def __list_html(l, ltype):
-	s = f"<{ltype}>"
+	s = [f"<{ltype}>"]
 	for elem in l:
 		s += f"<li>{__list_str(elem, ltype)}</li>"
 	s += f"</{ltype}>"
-	return s
+	return "".join(s)
 
 
 def __list_str(elem, ltype):

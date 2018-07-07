@@ -10,23 +10,25 @@ def ol(l: list):
 
 
 def __indented_ul(l, level):
-	s = "\n"
+	s = ["\n"]
 	for elem in l:
 		if isinstance(elem, collections.Iterable):
 			s += __indented_ul(l, level + 1)
 		else:
-			s += "\n%s%s" % ("  " * level, str(elem))
-	return s
+			indent = "  " * level
+			s += f"\n{indent}{str(elem)}"
+	return "".join(s)
 
 
 def __indented_ol(l, level):
-	s = "\n"
+	s = ["\n"]
 	for i, elem in enumerate(l):
 		if isinstance(elem, collections.Iterable):
 			s += __indented_ol(elem, level + 1)
 		else:
-			s += "\n%s%d. %s" % ("  " * level, i, str(elem))
-	return s
+			indent = "  " * level
+			s += f"\n{indent}{i}.{str(elem)}"
+	return "".join(s)
 
 
 def img(url, alt):
