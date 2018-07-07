@@ -71,7 +71,7 @@ class BlogFile:
 		self.variables["dir_static"] = "../../static"
 		self.variables["home"] = "../../index.html"
 		# global scope (completed by subclasses):
-		self.globscope = {"datetime": datetime, "template_each": template_each}
+		self.globscope = globals_basic
 
 	def setlangs(self, langs):
 		self.langs = langs
@@ -93,7 +93,7 @@ class Post(BlogFile):
 		super().__init__(lang, name, content)
 		self.header = header
 		# execute the header:
-		self.globscope = {**self.globscope, "Post": Post, **genmarkdown.__dict__}
+		self.globscope = globals_markdown
 		exec(header, self.globscope, self.variables)
 		# calculate datetime:
 		self.datetime = datetime.strptime(self.variables["date"], settings.date_format)
@@ -126,7 +126,7 @@ class Post(BlogFile):
 class Page(BlogFile):
 	def __init__(self, lang, name, content):
 		super().__init__(lang, name, content)
-		self.globscope = {**self.globscope, "Page": Page, **genmarkdown.__dict__}
+		self.globscope = globals_markdown
 
 	def write_final(self):
 		path = f"{settings.dir_output}/{self.lang}/pages/{self.url}"
