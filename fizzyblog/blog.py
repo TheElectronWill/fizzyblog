@@ -1,12 +1,13 @@
 import re
 from datetime import datetime
 from typing import Iterable, Dict, Any, Mapping
-from fizzyblog.utils import *
+
 import markdown
 
-import fizzyblog.genmarkdown as genmarkdown
 import fizzyblog.genhtml as genhtml
+import fizzyblog.genmarkdown as genmarkdown
 import fizzyblog.settings as settings
+from fizzyblog.utils import *
 
 __reg = re.compile("\\${.*?}", re.DOTALL)
 __markdown = markdown.Markdown(extensions=settings.extensions, output_format="html5")
@@ -30,17 +31,37 @@ def render(md: str) -> str:
 	"""
 	return __markdown.reset().convert(md)
 
-def template_each(l: Iterable, template_name: str, vname="element") -> str:
-	if not template_name.endswith(".html"):
-		template_name += ".html"
 
-	template = read(f"{settings.dir_input}/templates/{template_name}")
-	res = ""
+def vtemplate_each(l: Iterable, template_src: str, vname="element") -> str:
+	"""
+	Applies a template to each element of l and return the concatenated results.
+	:param l: the elements to apply the template to
+	:param template_src: the template
+	:param vname: the name to give to the element when giving it to the template
+	:return: the concatenated results of all the evaluations of the template
+	"""
+	parts = []
 	for e in l:
 		variables = {vname: e}
-		html, count = evaluate(template, globals_html, variables)
-		res += html
-	return res
+		html, count = evaluate(template_src, globals_html, variables)
+		parts += html
+	return "".join(parts)
+
+
+def ftemplate_each(l: Iterable, template_file: str, vname="element") -> str:
+	"""
+	Reads a templates from a file in the templates directory and applies it to each element of l.
+	:param l: the elements to apply the template to
+	:param template_file: the template's filename; if it doesn't end by ".html" then ".html" will be added automatically
+	:param vname: the name to give to the element when giving it to the template
+	:return: the concatenated results of all the evaluations of the template
+	"""
+	if not template_file.endswith(".html"):
+		template_file += ".html"
+
+	template_src = read(f"{settings.dir_input}/templates/{template_file}")
+	return vtemplate_each(l, template_src, vname)
+
 
 template_post = read(f"{settings.dir_input}/templates/post.html")
 template_page = read(f"{settings.dir_input}/templates/page.html")
@@ -140,7 +161,8 @@ class Page(BlogFile):
 
 
 globals_basic = {"datetime": datetime,
-								 "template_each": template_each,
+								 "vtemplate_each": vtemplate_each,
+								 "ftemplate_each": ftemplate_each,
 								 "evaluate": evaluate,
 								 "render": render,
 								 "settings": settings,
