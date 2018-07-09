@@ -1,7 +1,9 @@
 import os
 
 import toml
-from fizzyblog.utils import touch, create
+
+import fizzyblog.default_resources as resources
+import fizzyblog.utils as utils
 
 if not os.path.isfile("config.toml"):
 	with open("config.toml", "w") as file:
@@ -34,11 +36,14 @@ os.makedirs(f"{dir_input}/posts", exist_ok=True)
 os.makedirs(f"{dir_input}/pages", exist_ok=True)
 os.makedirs(f"{dir_input}/templates", exist_ok=True)
 
-create(f"{dir_input}/templates/post.html", "<article>${post.content}</article>")
-create(f"{dir_input}/templates/page.html", "<article>${page.content}</article>")
-create(f"{dir_input}/templates/postlist.html", "<div>${ul(posts)}</div>")
-create(f"{dir_input}/templates/taglist.html", "<div>${ul(tags)}</div>")
-create(f"{dir_input}/templates/yearlist.html", "<div>${ul(years)}</div>")
+utils.create(f"{dir_input}/templates/base.html", resources.base)
+utils.create(f"{dir_input}/templates/head.html", resources.head)
+utils.create(f"{dir_input}/templates/post.html", resources.post)
+utils.create(f"{dir_input}/templates/page.html", resources.page)
+utils.create(f"{dir_input}/templates/post_inlist.html", resources.post_in_list)
+utils.create(f"{dir_input}/templates/postlist.html", resources.postlist)
+utils.create(f"{dir_input}/templates/taglist.html", resources.taglist)
+utils.create(f"{dir_input}/templates/yearlist.html", resources.yearlist)
 
 for lang in site_langs:
 	os.makedirs(f"{dir_output}/static", exist_ok=True)

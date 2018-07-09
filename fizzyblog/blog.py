@@ -76,11 +76,23 @@ def ftemplate_each(l: Iterable, template_file: str, vname="element") -> str:
 	return vtemplate_each(l, template_src, vname)
 
 
+template_base = read(f"{settings.dir_input}/templates/base.html")
+template_head = read(f"{settings.dir_input}/templates/head.html")
 template_post = read(f"{settings.dir_input}/templates/post.html")
 template_page = read(f"{settings.dir_input}/templates/page.html")
 template_postlist = read(f"{settings.dir_input}/templates/postlist.html")
 template_taglist = read(f"{settings.dir_input}/templates/taglist.html")
 template_yearlist = read(f"{settings.dir_input}/templates/yearlist.html")
+
+
+def apply_base(lang, title, body):
+	headvars = {"lang": lang, "html_title": title}
+	head = evaluate(template_head, globals_html, headvars)
+
+	basevars = {"html_head": head, "html_body": body}
+	base = evaluate(template_base, globals_html, basevars)
+	return base
+
 
 class BlogFile:
 	def __init__(self, lang, name, content):
