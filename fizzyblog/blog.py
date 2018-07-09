@@ -1,4 +1,3 @@
-import re
 from datetime import datetime
 from typing import Iterable, Dict, Any, Mapping
 
@@ -9,8 +8,22 @@ import fizzyblog.genmarkdown as genmarkdown
 import fizzyblog.settings as settings
 from fizzyblog.utils import *
 
-__reg = re.compile("\\${.*?}", re.DOTALL)
 __markdown = markdown.Markdown(extensions=settings.extensions, output_format="html5")
+
+def __eval(group: str, globals, locals) -> str:
+	type = group[0]
+	content = group[2:-1]
+	if type == '$':
+		return eval(content, globals, locals)
+	else:
+		s = content.split(":", maxsplit=2)
+		iterable = eval(s[0], globals, locals)
+		vname = s[1]
+		template = s[2]
+		if type == '@':
+			return vtemplate_each(iterable, template, vname)
+		else:
+			return ftemplate_each(iterable, template, vname)
 
 def evaluate(data: str, globals: Dict[str, Any] = globals(), locals: Mapping[str, Any] = locals()) -> (str, int):
 	"""
@@ -20,7 +33,7 @@ def evaluate(data: str, globals: Dict[str, Any] = globals(), locals: Mapping[str
 	:param locals: local scope for eval
 	:return: the data with all expressions evaluated
 	"""
-	return __reg.subn(lambda x: str(eval(x.group()[2:-1], globals, locals)), data)
+	return braces_replace(data, lambda group: str(__eval(group, globals, locals)))
 
 
 def render(md: str) -> str:

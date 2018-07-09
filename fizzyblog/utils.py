@@ -37,3 +37,65 @@ def getlist(dict, key):
 		v = []
 		dict[key] = v
 	return v
+
+def braces_iter(data: str):
+	content = []
+	count = 0
+	i = 0
+	limit = len(data)
+	while i < limit:
+		ch = data[i]
+		inext = i + 1
+		cnext = data[inext] if inext < limit else None
+		if ch == "\\" and count == 0 and (cnext == "$" or cnext == "@"):
+			i += 2
+		if (ch == "$" or ch == "@") and cnext == "{":
+			count += 1
+			i += 2
+			content.append(ch)
+			content.append(cnext)
+		else:
+			i += 1
+			if count > 0:
+				content.append(ch)
+			if ch == "}":
+				count -= 1
+				if count == 0:
+					yield "".join(content)
+					content.clear()
+
+
+def braces_replace(data: str, replacer) -> str:
+	res = []
+	content = []
+	count = 0
+	i = 0
+	limit = len(data)
+	while i < limit:
+		ch = data[i]
+		inext = i + 1
+		cnext = data[inext] if inext < limit else None
+		if ch == "\\" and count == 0 and (cnext == "$" or cnext == "@"):
+			i += 2
+		if (ch == "$" or ch == "@") and cnext == "{":
+			count += 1
+			i += 2
+			content.append(ch)
+			content.append(cnext)
+		else:
+			i += 1
+			if count > 0:
+				content.append(ch)
+				if ch == "}":
+					count -= 1
+					if count == 0:
+						res.append(replacer("".join(content)))
+						content.clear()
+			else:
+				res.append(ch)
+	return "".join(res)
+
+if __name__ == '__main__':
+	data = "${in ${inner} @{a:b:c}} @{a${}} }{}{}{}${@{${@{}@{}@{}}}}{}}${ø]]@@@@{]{}{{]}\n"*100
+	r = braces_replace(data, lambda x: "'" + str(x)[2:-1] + "'")
+	print(r)
