@@ -21,6 +21,25 @@ def list_blog(directory):
 		yield f, name, lang
 
 
+def process_taxonomy(name, dict, list_template, lang, common_vars, name_plural=None):
+	name_plural = ifnone(name_plural, f"{name}s")
+	print(f"Writing posts lists by {name}")
+	for taxo, posts in dict.items():
+		variables = {name: taxo, "posts": posts, "post_count": len(posts), **common_vars}
+		html_postlist = evaluate(template_postlist, globals_html, variables)
+		html_final = apply_base(lang, f"{settings.site_title} - {name}={taxo} ({lang})", html_postlist)
+		path = f"{settings.dir_output}/{lang}/{name_plural}/{taxo}.html"
+		write(path, html_final)
+
+	print(f"Writing {name_plural} list")
+	variables = {name_plural: dict.keys(), f"{name_plural}_tuples": dict.items(), f"{name}_count": len(dict), **common_vars}
+	html_list = evaluate(list_template, globals_html, variables)
+	html_final = apply_base(lang, f"{settings.site_title} - {name_plural.capitalize()} ({lang})", html_list)
+	path = f"{settings.dir_output}/{lang}/{name_plural}/index.html"
+	write(path, html_final)
+
+	print(f"Done processing {name_plural} for language {lang}")
+
 def process_posts(base_dir):
 	langs_dict = {}  # posts by lang
 	posts_dict = {}  # langs by post
@@ -55,36 +74,15 @@ def process_posts(base_dir):
 				getlist(tags_dict, tag).append(p)
 
 		print("Writing global posts list")
-		variables = {"posts": posts, "lang": lang}
-		html_postlist, c = evaluate(template_postlist, globals_html, variables)
+		common_vars = {"lang": lang, "root": "../..", "static": "../../static"}
+		variables = {"posts": posts, "post_count": len(posts), **common_vars}
+		html_postlist = evaluate(template_postlist, globals_html, variables)
+		html_final = apply_base(lang, f"{settings.site_title} - Posts ({lang})", html_postlist)
 		path = f"{settings.dir_output}/{lang}/posts/index.html"
-		write(path, html_postlist)
+		write(path, html_final)
 
-		print("Writing posts lists by tag")
-		for tag, posts in tags_dict.items():
-			variables = {"posts": posts, "tag": tag, "lang": lang}
-			html_postlist, c = evaluate(template_postlist, globals_html, variables)
-			path = f"{settings.dir_output}/{lang}/tags/{tag}.html"
-			write(path, html_postlist)
-
-		print("Writing tags list")
-		variables = {"tags": tags_dict.keys(), "lang": lang}
-		html_taglist, c = evaluate(template_taglist, globals_html, variables)
-		path = f"{settings.dir_output}/{lang}/tags/index.html"
-		write(path, html_taglist)
-
-		print("Writing posts lists by year")
-		for year, posts in years_dict.items():
-			variables = {"posts": posts, "year": year, "lang": lang}
-			html_postlist, c = evaluate(template_postlist, globals_html, variables)
-			path = f"{settings.dir_output}/{lang}/years/{year}.html"
-			write(path, html_postlist)
-
-		print("Writing years list")
-		variables = {"years": years_dict.keys(), "lang": lang}
-		html_yearlist, c = evaluate(template_yearlist, globals_html, variables)
-		path = f"{settings.dir_output}/{lang}/years/index.html"
-		write(path, html_yearlist)
+		process_taxonomy("tag", tags_dict, template_taglist, lang, common_vars)
+		process_taxonomy("year", years_dict, template_yearlist, lang, common_vars)
 
 	# Step 3: evaluate, render and write to html output
 	print("Rendering all the posts")
