@@ -1,4 +1,12 @@
 import os
+from typing import Iterator
+
+
+def ifnone(v, default):
+	if v is None:
+		return default
+	else:
+		return v
 
 def read(f: str) -> str:
 	"""
