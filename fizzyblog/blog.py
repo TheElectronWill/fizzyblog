@@ -142,8 +142,7 @@ class BlogFile:
 		self.variables["langs"] = langs
 
 	def evaluate(self):
-		self.content, count = evaluate(self.content, self.globscope, self.variables)
-		return count
+		self.content = evaluate(self.content, self.globscope, self.variables)
 
 	def render(self):
 		"""Renders the markdown as HTML. This method replaces the 'content' variable."""
