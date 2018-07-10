@@ -18,16 +18,19 @@ def __eval(group: str, globals, locals) -> str:
 	else:
 		s = content.split(":", maxsplit=2)
 		iterable = eval(s[0], globals, locals)
-		vname = s[1]
+		m = s[1].split(";")
+		vname = m[0].strip()
+		exprs = m[1:]
 		template = s[2]
-		if type == '@':
-			return vtemplate_each(iterable, template, vname)
-		else:
-			return ftemplate_each(iterable, template, vname)
+		if type == '§':
+			return vtemplate_each(iterable, template, vname, exprs, globals, locals)
+		else: # type == '@'
+			return ftemplate_each(iterable, template, vname, exprs, globals, locals)
 
-def evaluate(data: str, globals: Dict[str, Any] = globals(), locals: Mapping[str, Any] = locals()) -> (str, int):
+def evaluate(data: str, globals: Dict[str, Any], locals: Mapping[str, Any]) -> str:
 	"""
-	Evaluates all the ${expr} and replaces them by their result
+	Evaluates all the ${expr}, §{iterable:vname:expr_for_each} and @{iterable:vname:template_file_for_each}
+	and replaces them by their result
 	:param data: the data to evaluate
 	:param globals: global scope for eval
 	:param locals: local scope for eval
@@ -45,35 +48,49 @@ def render(md: str) -> str:
 	return __markdown.reset().convert(md)
 
 
-def vtemplate_each(l: Iterable, template_src: str, vname="element") -> str:
+def vtemplate_each(l: Iterable, template_src: str, vname: str, expressions=None, globals=None, locals=None) -> str:
 	"""
 	Applies a template to each element of l and return the concatenated results.
 	:param l: the elements to apply the template to
 	:param template_src: the template
 	:param vname: the name to give to the element when giving it to the template
+	:param expressions: python statements to execute before each template evaluation; the current element is available
+	:param globals: the global scope to use
+	:param locals: additional local variables
 	:return: the concatenated results of all the evaluations of the template
 	"""
+	expressions = ifnone(expressions, [])
+	globals = ifnone(globals, globals_html)
+	locals = ifnone(locals, {})
 	parts = []
 	for e in l:
-		variables = {vname: e}
-		html, count = evaluate(template_src, globals_html, variables)
+		if isinstance(e, BlogFile):
+			variables = {**locals, vname: e, "lang": e.lang}
+		else:
+			variables = {**locals, vname: e}
+		for expr in expressions:
+			exec(expr, globals_html, variables)
+		html = evaluate(template_src, globals, variables)
 		parts += html
 	return "".join(parts)
 
 
-def ftemplate_each(l: Iterable, template_file: str, vname="element") -> str:
+def ftemplate_each(l: Iterable, template_file: str, vname: str, expressions=None, globals=None, locals=None) -> str:
 	"""
 	Reads a templates from a file in the templates directory and applies it to each element of l.
 	:param l: the elements to apply the template to
 	:param template_file: the template's filename; if it doesn't end by ".html" then ".html" will be added automatically
 	:param vname: the name to give to the element when giving it to the template
+	:param expressions: python statements to execute before each template evaluation; the current element is available
+	:param globals: the global scope to use
+	:param locals: additional local variables
 	:return: the concatenated results of all the evaluations of the template
 	"""
 	if not template_file.endswith(".html"):
 		template_file += ".html"
 
 	template_src = read(f"{settings.dir_input}/templates/{template_file}")
-	return vtemplate_each(l, template_src, vname)
+	return vtemplate_each(l, template_src, vname, expressions, globals, locals)
 
 
 template_base = read(f"{settings.dir_input}/templates/base.html")

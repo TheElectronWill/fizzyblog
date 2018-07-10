@@ -38,7 +38,9 @@ def getlist(dict, key):
 		dict[key] = v
 	return v
 
-def braces_iter(data: str):
+__types = "$@§"
+
+def braces_iter(data: str) -> Iterator[str]:
 	content = []
 	count = 0
 	i = 0
@@ -47,9 +49,9 @@ def braces_iter(data: str):
 		ch = data[i]
 		inext = i + 1
 		cnext = data[inext] if inext < limit else None
-		if ch == "\\" and count == 0 and (cnext == "$" or cnext == "@"):
+		if ch == "\\" and count == 0 and (cnext in __types):
 			i += 2
-		if (ch == "$" or ch == "@") and cnext == "{":
+		if (ch in __types) and cnext == "{":
 			count += 1
 			i += 2
 			content.append(ch)
@@ -75,9 +77,9 @@ def braces_replace(data: str, replacer) -> str:
 		ch = data[i]
 		inext = i + 1
 		cnext = data[inext] if inext < limit else None
-		if ch == "\\" and count == 0 and (cnext == "$" or cnext == "@"):
+		if ch == "\\" and count == 0 and (cnext in __types):
 			i += 2
-		if (ch == "$" or ch == "@") and cnext == "{":
+		if (ch in __types) and cnext == "{":
 			count += 1
 			i += 2
 			content.append(ch)
