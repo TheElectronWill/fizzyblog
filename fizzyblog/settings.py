@@ -16,7 +16,7 @@ if not os.path.isfile("config.toml"):
 		file.write("[engine]")
 		file.write("\ninput = \"src\"")
 		file.write("\noutput = \"out\"")
-		file.write("\nextensions = [\"markdown.extensions.meta\",\"markdown.extensions.extra\",\"mdx_math\"]")
+		file.write("\nextensions = [\"markdown.extensions.codehilite\", \"markdown.extensions.extra\",\"mdx_math\"]")
 
 config = toml.load("config.toml")
 
