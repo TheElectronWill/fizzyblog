@@ -1,3 +1,4 @@
+import time
 import fizzyblog.settings as settings
 from fizzyblog.blog import evaluate, Post, Page, globals_html, template_postlist, template_taglist, template_yearlist, apply_base
 from fizzyblog.utils import *
@@ -125,7 +126,10 @@ def process_pages(base_dir):
 
 
 if __name__ == "__main__":
+	t0 = time.perf_counter()
 	base_dir = os.path.abspath(os.getcwd())
 	nposts = process_posts(base_dir)
 	npages = process_pages(base_dir)
-	print(f"Done! {nposts} posts and {npages} markdown pages have been processed.")
+	t1 = time.perf_counter()
+	time = t1-t0
+	print(f"Done! {nposts} posts and {npages} markdown pages have been processed in {time:.2} seconds.")
