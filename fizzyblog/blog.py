@@ -102,11 +102,12 @@ template_taglist = read(f"{settings.dir_input}/templates/taglist.html")
 template_yearlist = read(f"{settings.dir_input}/templates/yearlist.html")
 
 
-def apply_base(lang, title, body):
-	headvars = {"lang": lang, "html_title": title}
+def apply_base(lang, title, body, vars=None):
+	vars = ifnone(vars, common_vars)
+	headvars = {**vars, "lang": lang, "html_title": title}
 	head = evaluate(template_head, globals_html, headvars)
 
-	basevars = {"html_head": head, "html_body": body}
+	basevars = {**vars, "html_head": head, "html_body": body}
 	base = evaluate(template_base, globals_html, basevars)
 	return base
 
