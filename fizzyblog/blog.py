@@ -178,10 +178,11 @@ class Post(BlogFile):
 
 	def write_final(self):
 		path = f"{settings.dir_output}/{self.lang}/posts/{self.url}"
-		vars = {"post": self}
-		html, c = evaluate(template_post, globals_html, vars)
+		vars = {"post": self, "lang": self.lang, **common_vars}
+		html_body = evaluate(template_post, globals_html, vars)
+		html_final = apply_base(self.lang, f"{settings.site_title} - {self.title}", html_body)
 		with open(path, "w") as file:
-			file.write(html)
+			file.write(html_final)
 
 	def __str__(self):
 		return self.title
@@ -194,10 +195,11 @@ class Page(BlogFile):
 
 	def write_final(self):
 		path = f"{settings.dir_output}/{self.lang}/pages/{self.url}"
-		vars = {"page": self}
-		html = evaluate(template_page, globals_html, vars)
+		vars = {"page": self, "lang": self.lang, **common_vars}
+		html_body = evaluate(template_page, globals_html, vars)
+		html_final = apply_base(self.lang, f"{settings.site_title} - {self.name}", html_body)
 		with open(path, "w") as file:
-			file.write(html)
+			file.write(html_final)
 
 	def __str__(self):
 		return self.name
@@ -214,3 +216,4 @@ globals_basic = {"datetime": datetime,
 								 "Page": Page}
 globals_html = {**globals_basic, **genhtml.__dict__}
 globals_markdown = {**globals_basic, **genmarkdown.__dict__}
+common_vars = {"root": "../..", "static": "../../static"}
