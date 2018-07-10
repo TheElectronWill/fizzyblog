@@ -40,9 +40,14 @@ utils.create(f"{dir_input}/templates/base.html", resources.base)
 utils.create(f"{dir_input}/templates/head.html", resources.head)
 utils.create(f"{dir_input}/templates/post.html", resources.post)
 utils.create(f"{dir_input}/templates/page.html", resources.page)
-utils.create(f"{dir_input}/templates/post_inlist.html", resources.post_in_list)
+
+utils.create(f"{dir_input}/templates/post_in_list.html", resources.post_in_list)
 utils.create(f"{dir_input}/templates/postlist.html", resources.postlist)
+
+utils.create(f"{dir_input}/templates/tag_in_list.html", resources.tag_in_list)
 utils.create(f"{dir_input}/templates/taglist.html", resources.taglist)
+
+utils.create(f"{dir_input}/templates/year_in_list.html", resources.year_in_list)
 utils.create(f"{dir_input}/templates/yearlist.html", resources.yearlist)
 
 for lang in site_langs:
