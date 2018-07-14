@@ -7,9 +7,8 @@ OK, I just want a simple blog with articles written in markdown and, very import
 - Uses python-markdown under the hood
 - Templates written in html+python
 - Admonitions and code hilighting
-- Organizes the articles by language
-- Can sort articles by year and tag
 - Simple tag system
+- Can sort articles by year, tag or language
 - Ready-to-use default templates, just add your CSS and build your blog :)
 
 ## Let's start
