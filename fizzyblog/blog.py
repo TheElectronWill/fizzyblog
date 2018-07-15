@@ -86,11 +86,19 @@ def ftemplate_each(l: Iterable, template_file: str, vname: str, expressions=None
 	:param locals: additional local variables
 	:return: the concatenated results of all the evaluations of the template
 	"""
-	if not template_file.endswith(".html"):
-		template_file += ".html"
-
-	template_src = read(f"{settings.dir_input}/templates/{template_file}")
+	template_src = read_ftemplate(template_file)
 	return vtemplate_each(l, template_src, vname, expressions, globals, locals)
+
+
+def read_ftemplate(name: str) -> str:
+	if not name.endswith(".html"):
+		name += ".html"
+
+	cached = template_cache.get(name)
+	if cached is None:
+		cached = read(f"{settings.dir_input}/templates/{template_file}")
+		template_cache[name] = cached
+	return cached
 
 
 template_base = read(f"{settings.dir_input}/templates/base.html")
@@ -100,6 +108,11 @@ template_page = read(f"{settings.dir_input}/templates/page.html")
 template_postlist = read(f"{settings.dir_input}/templates/postlist.html")
 template_taglist = read(f"{settings.dir_input}/templates/taglist.html")
 template_yearlist = read(f"{settings.dir_input}/templates/yearlist.html")
+template_cache = {"base.html": template_base,
+									"post.html": template_post,
+									"postlist.html": template_postlist,
+									"taglist.html": template_taglist,
+									"yearlist.html": template_yearlist}
 
 
 def apply_base(lang, title, body, vars=None):
