@@ -2,7 +2,7 @@ base = """
 <!DOCTYPE html>
 <html>
 <head>
-${html_head}
+@{head}
 </head>
 <body>
 ${html_body}

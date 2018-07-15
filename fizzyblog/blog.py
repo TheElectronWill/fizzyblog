@@ -102,7 +102,6 @@ def read_ftemplate(name: str) -> str:
 
 
 template_base = read(f"{settings.dir_input}/templates/base.html")
-template_head = read(f"{settings.dir_input}/templates/head.html")
 template_post = read(f"{settings.dir_input}/templates/post.html")
 template_page = read(f"{settings.dir_input}/templates/page.html")
 template_postlist = read(f"{settings.dir_input}/templates/postlist.html")
@@ -117,10 +116,7 @@ template_cache = {"base.html": template_base,
 
 def apply_base(lang, title, body, vars=None):
 	vars = ifnone(vars, common_vars)
-	headvars = {**vars, "lang": lang, "html_title": title}
-	head = evaluate(template_head, globals_html, headvars)
-
-	basevars = {**vars, "html_head": head, "html_body": body}
+	basevars = {**vars, "lang": lang, "html_title": title, "html_body": body}
 	base = evaluate(template_base, globals_html, basevars)
 	return base
 
