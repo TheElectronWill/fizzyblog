@@ -15,6 +15,11 @@ def __eval(group: str, globals, locals) -> str:
 	content = group[2:-1]
 	if type == '$':
 		return eval(content, globals, locals)
+	elif ":" not in content:  # @{}
+		if type != '@':
+			raise Exception(f"Invalid loop template: {group}")
+		template_src = read_ftemplate(content)
+		return evaluate(template_src, globals, locals)
 	else:
 		s = content.split(":", maxsplit=2)
 		iterable = eval(s[0], globals, locals)
