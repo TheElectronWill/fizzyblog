@@ -101,7 +101,7 @@ def read_ftemplate(name: str) -> str:
 
 	cached = template_cache.get(name)
 	if cached is None:
-		cached = read(f"{settings.dir_input}/templates/{template_file}")
+		cached = read(f"{settings.dir_input}/templates/{name}")
 		template_cache[name] = cached
 	return cached
 
