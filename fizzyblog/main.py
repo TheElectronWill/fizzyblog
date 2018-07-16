@@ -130,6 +130,8 @@ if __name__ == "__main__":
 	base_dir = os.path.abspath(os.getcwd())
 	nposts = process_posts(base_dir)
 	npages = process_pages(base_dir)
+	remove_dir(f"{settings.dir_output}/static")
+	copy_dir(f"{settings.dir_input}/static", f"{settings.dir_output}/static")
 	t1 = time.perf_counter()
 	time = t1-t0
 	print(f"Done! {nposts} posts and {npages} markdown pages have been processed in {time:.2} seconds.")

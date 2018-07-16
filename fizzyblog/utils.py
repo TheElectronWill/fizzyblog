@@ -1,4 +1,5 @@
 import os
+import distutils.dir_util as dirutils
 from typing import Iterator
 
 
@@ -38,6 +39,12 @@ def write(f: str, data: str):
 def create(f: str, data: str = ""):
 	if not os.path.isfile(f):
 		write(f, data)
+
+def copy_dir(src: str, dest: str):
+	dirutils.copy_tree(src, dest)
+
+def remove_dir(dir: str):
+	dirutils.remove_tree(dir)
 
 def getlist(dict, key):
 	v = dict.get(key)

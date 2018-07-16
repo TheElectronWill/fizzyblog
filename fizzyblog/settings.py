@@ -35,6 +35,7 @@ extensions = config["engine"]["extensions"]
 os.makedirs(f"{dir_input}/posts", exist_ok=True)
 os.makedirs(f"{dir_input}/pages", exist_ok=True)
 os.makedirs(f"{dir_input}/templates", exist_ok=True)
+os.makedirs(f"{dir_input}/static", exist_ok=True)
 
 utils.create(f"{dir_input}/templates/base.html", resources.base)
 utils.create(f"{dir_input}/templates/head.html", resources.head)
@@ -51,7 +52,6 @@ utils.create(f"{dir_input}/templates/year_in_list.html", resources.year_in_list)
 utils.create(f"{dir_input}/templates/yearlist.html", resources.yearlist)
 
 for lang in site_langs:
-	os.makedirs(f"{dir_output}/static", exist_ok=True)
 	os.makedirs(f"{dir_output}/{lang}/posts", exist_ok=True)
 	os.makedirs(f"{dir_output}/{lang}/pages", exist_ok=True)
 	os.makedirs(f"{dir_output}/{lang}/tags", exist_ok=True)
