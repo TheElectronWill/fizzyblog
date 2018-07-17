@@ -51,8 +51,17 @@ utils.create(f"{dir_input}/templates/taglist.html", resources.taglist)
 utils.create(f"{dir_input}/templates/year_in_list.html", resources.year_in_list)
 utils.create(f"{dir_input}/templates/yearlist.html", resources.yearlist)
 
+i18n_dict = {}
+
 for lang in site_langs:
 	os.makedirs(f"{dir_output}/{lang}/posts", exist_ok=True)
 	os.makedirs(f"{dir_output}/{lang}/pages", exist_ok=True)
 	os.makedirs(f"{dir_output}/{lang}/tags", exist_ok=True)
 	os.makedirs(f"{dir_output}/{lang}/years", exist_ok=True)
+
+	i18n_file = f"{dir_input}/i18n.{lang}.toml"
+	if os.path.isfile(i18n_file):
+		i18n_dict[lang] = toml.load(i18n_file)
+
+if config.get("i18n") is not None:
+	i18n_dict = {**config.get("i18n"), **i18n_dict}

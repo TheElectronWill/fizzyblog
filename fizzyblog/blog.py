@@ -106,6 +106,34 @@ def read_ftemplate(name: str) -> str:
 	return cached
 
 
+def localized_var(lang, var):
+	o = settings.config.get("vars")
+	if o is None:
+		return None
+
+	o = o.get(lang)
+	if o is None:
+		return settings.config["vars"][settings.default_lang].get(var)
+
+	return ifnone(o.get(var), settings.config["vars"][settings.default_lang].get(var))
+
+
+current_lang = settings.default_lang
+def i18n(var: str, lang=None):
+	if lang is None:
+		lang = current_lang
+	dict = settings.i18n_dict.get(lang)
+	if dict is None:
+		dict = settings.i18n_dict.get(settings.default_lang)
+	if dict is None:
+		return None
+	else:
+		return dict.get(var)
+
+def _(var: str, lang=None):
+	return i18n(var, lang)
+
+
 template_base = read(f"{settings.dir_input}/templates/base.html")
 template_post = read(f"{settings.dir_input}/templates/post.html")
 template_page = read(f"{settings.dir_input}/templates/page.html")
@@ -226,7 +254,9 @@ globals_basic = {"datetime": datetime,
 								 "settings": settings,
 								 "BlogFile": BlogFile,
 								 "Post": Post,
-								 "Page": Page}
+								 "Page": Page,
+								 "i18n": i18n,
+								 "_": _}
 globals_html = {**globals_basic, **genhtml.__dict__}
 globals_markdown = {**globals_basic, **genmarkdown.__dict__}
 common_vars = {"root": "../..", "static": "../../static"}
