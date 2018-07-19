@@ -15,7 +15,16 @@ def __eval(group: str, globals, locals) -> str:
 	content = group[2:-1]
 	if type == '$':
 		return eval(content, globals, locals)
-	elif ":" not in content:  # @{}
+	elif type == '!': # !{arbitrary code}
+		decl = "def __fizzy():\n"
+		code = f"{decl}{content}"
+		new_dict = {**globals, **locals}
+
+		exec(code, new_dict, locals) # Execution defines the function __fizzy()
+		fizzy = locals.pop("__fizzy") # Get that function
+		return fizzy() # Call it to get the result
+
+	elif ":" not in content:  # @{filename}
 		if type != '@':
 			raise Exception(f"Invalid loop template: {group}")
 		template_src = read_ftemplate(content)
