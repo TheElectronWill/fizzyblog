@@ -1,6 +1,6 @@
 import time
 import fizzyblog.settings as settings
-from fizzyblog.blog import evaluate, Post, Page, globals_html, template_postlist, template_taglist, template_yearlist, apply_base
+from fizzyblog.blog import evaluate, Post, Page, globals_html, template_postlist, template_taglist, template_yearlist, apply_base, flag_let_md_code
 from fizzyblog.utils import *
 
 
@@ -44,6 +44,7 @@ def process_taxonomy(name, dict, list_template, lang, common_vars, name_plural=N
 	print(f"Done processing {name_plural} for language {lang}")
 
 def process_posts(base_dir):
+	global flag_let_md_code
 	langs_dict = {}  # posts by lang
 	posts_dict = {}  # langs by post
 	posts_dir = f"{settings.dir_input}/posts"
@@ -77,6 +78,7 @@ def process_posts(base_dir):
 				getlist(tags_dict, tag).append(p)
 
 		print("Writing global posts list")
+		flag_let_md_code = False
 		langs = settings.site_langs
 		common_vars = {"lang": lang, "langs": langs, "root": "../..", "static": "../../static"}
 		variables = {"posts": posts, "post_count": len(posts), **common_vars}
@@ -87,6 +89,7 @@ def process_posts(base_dir):
 
 		process_taxonomy("tag", tags_dict, template_taglist, lang, common_vars)
 		process_taxonomy("year", years_dict, template_yearlist, lang, common_vars)
+		flag_let_md_code = True
 
 	# Step 3: evaluate, render and write to html output
 	print("Rendering all the posts")

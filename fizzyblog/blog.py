@@ -9,6 +9,7 @@ import fizzyblog.settings as settings
 from fizzyblog.utils import *
 
 __markdown = markdown.Markdown(extensions=settings.extensions, output_format="html5")
+flag_let_md_code = True
 
 def __eval(group: str, globals: dict, locals: dict) -> str:
 	type = group[0]
@@ -47,16 +48,17 @@ def __eval(group: str, globals: dict, locals: dict) -> str:
 		else: # @{iterable:vname:filename}
 			return ftemplate_each(iterable, template, vname, exprs, globals, locals)
 
-def evaluate(data: str, globals: Dict[str, Any], locals: Mapping[str, Any]) -> str:
+def evaluate(data: str, globals: Dict[str, Any], locals: Mapping[str, Any], let_md_code=flag_let_md_code) -> str:
 	"""
 	Evaluates all the ${expr}, §{iterable:vname:expr_for_each} and @{iterable:vname:template_file_for_each}
 	and replaces them by their result
 	:param data: the data to evaluate
 	:param globals: global scope for eval
 	:param locals: local scope for eval
+	:param let_md_code: True to prevent markdown code escapement, False to espace it normally
 	:return: the data with all expressions evaluated
 	"""
-	return braces_replace(data, lambda group: str(__eval(group, globals, locals)))
+	return braces_replace(data, lambda group: str(__eval(group, globals, locals)), let_md_code)
 
 
 def render(md: str) -> str:
@@ -90,7 +92,7 @@ def vtemplate_each(l: Iterable, template_src: str, vname: str, expressions=None,
 			variables = {**locals, vname: e}
 		for expr in expressions:
 			exec(expr, globals_html, variables)
-		html = evaluate(template_src, globals, variables)
+		html = evaluate(template_src, globals, variables, flag_let_md_code)
 		parts += html
 	return "".join(parts)
 
@@ -162,10 +164,10 @@ template_cache = {"base.html": template_base,
 									"yearlist.html": template_yearlist}
 
 
-def apply_base(current, parent, lang, langs, title, body, vars=None):
+def apply_base(current, parent, lang, langs, title, body, vars=None, let_md_code=flag_let_md_code):
 	vars = ifnone(vars, common_vars)
 	basevars = {**vars, "current": current, "parent": parent, "lang": lang, "langs": langs, "html_title": title, "html_body": body}
-	base = evaluate(template_base, globals_html, basevars)
+	base = evaluate(template_base, globals_html, basevars, let_md_code)
 	return base
 
 
