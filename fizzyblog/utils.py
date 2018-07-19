@@ -1,6 +1,5 @@
 import os
 import distutils.dir_util as dirutils
-from typing import Iterator
 
 
 def ifnone(v, default):
@@ -8,6 +7,7 @@ def ifnone(v, default):
 		return default
 	else:
 		return v
+
 
 def read(f: str) -> str:
 	"""
@@ -31,7 +31,6 @@ def read_doc(f: str) -> (str, str):
 def touch(path):
 	open(path, 'a').close()
 
-
 def write(f: str, data: str):
 	with open(f, 'w+') as file:
 		file.write(data)
@@ -54,32 +53,6 @@ def getlist(dict, key):
 	return v
 
 __types = "$@§"
-
-def braces_iter(data: str) -> Iterator[str]:
-	content = []
-	count = 0
-	i = 0
-	limit = len(data)
-	while i < limit:
-		ch = data[i]
-		inext = i + 1
-		cnext = data[inext] if inext < limit else None
-		if ch == "\\" and count == 0 and (cnext in __types):
-			i += 2
-		if (ch in __types) and cnext == "{":
-			count += 1
-			i += 2
-			content.append(ch)
-			content.append(cnext)
-		else:
-			i += 1
-			if count > 0:
-				content.append(ch)
-			if ch == "}":
-				count -= 1
-				if count == 0:
-					yield "".join(content)
-					content.clear()
 
 
 def braces_replace(data: str, replacer) -> str:
