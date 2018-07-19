@@ -10,14 +10,20 @@ from fizzyblog.utils import *
 
 __markdown = markdown.Markdown(extensions=settings.extensions, output_format="html5")
 
-def __eval(group: str, globals, locals) -> str:
+def __eval(group: str, globals: dict, locals: dict) -> str:
 	type = group[0]
 	content = group[2:-1]
-	if type == '$':
+	if type == '$': # ${expression}
+		# Uses eval to evaluates a Python expression, like an addition
 		return eval(content, globals, locals)
 	elif type == '!': # !{arbitrary code}
+		# Puts the code in a function with exec and calls the function to get the result
+		# The code should use a return statement to provide the result
 		decl = "def __fizzy():\n"
 		code = f"{decl}{content}"
+
+		# The local scope won't work because we'll be inside a function.
+		# That's why we copy locals to globals
 		new_dict = {**globals, **locals}
 
 		exec(code, new_dict, locals) # Execution defines the function __fizzy()
@@ -36,9 +42,9 @@ def __eval(group: str, globals, locals) -> str:
 		vname = m[0].strip()
 		exprs = m[1:]
 		template = s[2]
-		if type == '§':
+		if type == '§': # §{iterable:vname:template_code}
 			return vtemplate_each(iterable, template, vname, exprs, globals, locals)
-		else: # type == '@'
+		else: # @{iterable:vname:filename}
 			return ftemplate_each(iterable, template, vname, exprs, globals, locals)
 
 def evaluate(data: str, globals: Dict[str, Any], locals: Mapping[str, Any]) -> str:
