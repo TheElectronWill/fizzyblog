@@ -162,9 +162,9 @@ template_cache = {"base.html": template_base,
 									"yearlist.html": template_yearlist}
 
 
-def apply_base(lang, title, body, vars=None):
+def apply_base(current, parent, lang, langs, title, body, vars=None):
 	vars = ifnone(vars, common_vars)
-	basevars = {**vars, "lang": lang, "html_title": title, "html_body": body}
+	basevars = {**vars, "current": current, "parent": parent, "lang": lang, "langs": langs, "html_title": title, "html_body": body}
 	base = evaluate(template_base, globals_html, basevars)
 	return base
 
@@ -234,9 +234,9 @@ class Post(BlogFile):
 
 	def write_final(self):
 		path = f"{settings.dir_output}/{self.lang}/posts/{self.url}"
-		vars = {"post": self, "lang": self.lang, **common_vars}
+		vars = {"current": self.url,"parent": "posts", "post": self, "lang": self.lang, "langs": self.lang, **common_vars}
 		html_body = evaluate(template_post, globals_html, vars)
-		html_final = apply_base(self.lang, f"{settings.site_title} - {self.title}", html_body)
+		html_final = apply_base(self.url, "posts", self.lang, self.langs, f"{settings.site_title} - {self.title}", html_body)
 		with open(path, "w") as file:
 			file.write(html_final)
 
@@ -251,9 +251,9 @@ class Page(BlogFile):
 
 	def write_final(self):
 		path = f"{settings.dir_output}/{self.lang}/pages/{self.url}"
-		vars = {"page": self, "lang": self.lang, **common_vars}
+		vars = {"current": self.url, "parent": "pages", "page": self, "lang": self.lang, "langs": self.langs, **common_vars}
 		html_body = evaluate(template_page, globals_html, vars)
-		html_final = apply_base(self.lang, f"{settings.site_title} - {self.name}", html_body)
+		html_final = apply_base(self.url, "pages", self.lang, self.langs, f"{settings.site_title} - {self.name}", html_body)
 		with open(path, "w") as file:
 			file.write(html_final)
 
