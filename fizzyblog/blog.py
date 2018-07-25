@@ -39,10 +39,16 @@ def __eval(group: str, globals: dict, locals: dict) -> str:
 	else:
 		s = content.split(":", maxsplit=2)
 		iterable = eval(s[0], globals, locals)
-		m = s[1].split(";")
-		vname = m[0].strip()
-		exprs = m[1:]
-		template = s[2]
+		if len(s) == 2:  # iterable:code, we name the variable _ (yes! underscore)
+			vname = "_"
+			exprs = []
+			template = s[1]
+		else:
+			m = s[1].split(";")
+			vname = m[0].strip()
+			exprs = m[1:]
+			template = s[2]
+
 		if type == '§': # §{iterable:vname:template_code}
 			return vtemplate_each(iterable, template, vname, exprs, globals, locals)
 		else: # @{iterable:vname:filename}
