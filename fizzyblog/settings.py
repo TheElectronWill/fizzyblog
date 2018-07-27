@@ -12,6 +12,8 @@ if not os.path.isfile("config.toml"):
 		file.write("\nauthor = \"me\"")
 		file.write("\nlanguages = [\"en\"]")
 		file.write("\ndate_format = \"%Y-%m-%d\"")
+		file.write("\nmax_listed_posts = 8")
+		file.write("\nmax_listed_taxos = 12")
 		file.write("\n\n")
 		file.write("[engine]")
 		file.write("\ninput = \"src\"")
@@ -26,6 +28,8 @@ site_author = config["site"]["author"]
 site_langs = config["site"]["languages"]
 default_lang = site_langs[0]
 date_format = config["site"]["date_format"]
+max_listed_posts = config["site"]["max_listed_posts"]
+max_listed_taxos = config["site"]["max_listed_taxos"]
 
 # [engine]
 dir_input = config["engine"]["input"]

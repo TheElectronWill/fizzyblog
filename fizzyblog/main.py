@@ -1,6 +1,8 @@
 import time
+
 import fizzyblog.settings as settings
-from fizzyblog.blog import evaluate, Post, Page, globals_html, template_postlist, template_taglist, template_yearlist, apply_base, flag_let_md_code
+from fizzyblog.blog import evaluate, Post, Page, globals_html, template_postlist, template_taglist, template_yearlist, \
+	apply_base
 from fizzyblog.utils import *
 
 
@@ -27,19 +29,44 @@ def process_taxonomy(name, dict, list_template, lang, common_vars, name_plural=N
 	name_plural = ifnone(name_plural, f"{name}s")
 	print(f"Writing posts lists by {name}")
 	for taxo, posts in dict.items():
-		variables = {name: taxo, "posts": posts, "post_count": len(posts), **common_vars}
-		html_postlist = evaluate(template_postlist, globals_html, variables)
-		filename = f"{taxo}.html"
-		html_final = apply_base(filename, name_plural, lang, langs, f"{settings.site_title} - {name}={taxo} ({lang})", html_postlist)
-		path = f"{settings.dir_output}/{lang}/{name_plural}/{taxo}.html"
-		write(path, html_final)
+		imax = len(posts)
+		i_by = settings.max_listed_posts
+		pmax = 1 + (imax // i_by)
+		for i in range(0, imax, i_by):
+			less_posts = posts[i:i + i_by]
+			p = 1 + (i // i_by)
+			prev = p - 1 if p > 1 else None
+			next = p + 1 if p < pmax else None
+			end = "" if p == 1 else f".{p}"
+			variables = {name: taxo, "posts": less_posts, "post_count": len(posts),
+									 "page_max": pmax, "page_current": p, "page_prev": prev, "page_next": next,
+									 **common_vars}
+			html_postlist = evaluate(template_postlist, globals_html, variables)
+			filename = f"{taxo}.html"
+			html_final = apply_base(filename, name_plural, lang, langs, f"{settings.site_title} - {name}={taxo} ({lang})",
+															html_postlist)
+			path = f"{settings.dir_output}/{lang}/{name_plural}/{taxo}{end}.html"
+			write(path, html_final)
 
 	print(f"Writing {name_plural} list")
-	variables = {name_plural: dict.keys(), f"{name_plural}_tuples": dict.items(), f"{name}_count": len(dict), **common_vars}
-	html_list = evaluate(list_template, globals_html, variables)
-	html_final = apply_base("index.html", name_plural, lang, langs, f"{settings.site_title} - {name_plural.capitalize()} ({lang})", html_list)
-	path = f"{settings.dir_output}/{lang}/{name_plural}/index.html"
-	write(path, html_final)
+	items = list(dict.items())
+	imax = len(items)
+	i_by = settings.max_listed_taxos
+	pmax = 1 + (imax // i_by)
+	for i in range(0, imax, i_by):
+		less_items = items[i:i + i_by]
+		p = 1 + (i // i_by)
+		prev = p - 1 if p > 1 else None
+		next = p + 1 if p < pmax else None
+		end = "" if p == 1 else f".{p}"
+		variables = {name_plural: dict.keys(), f"{name_plural}_tuples": less_items, f"{name}_count": len(dict),
+								 "page_max": pmax, "page_current": p, "page_prev": prev, "page_next": next,
+								 **common_vars}
+		html_list = evaluate(list_template, globals_html, variables)
+		html_final = apply_base("index.html", name_plural, lang, langs,
+														f"{settings.site_title} - {name_plural.capitalize()} ({lang})", html_list)
+		path = f"{settings.dir_output}/{lang}/{name_plural}/index{end}.html"
+		write(path, html_final)
 
 	print(f"Done processing {name_plural} for language {lang}")
 
