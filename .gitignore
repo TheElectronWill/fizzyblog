@@ -3,3 +3,7 @@
 
 # Python
 __pycache__
+dist/
+build/
+*.egg-info
+.python-version

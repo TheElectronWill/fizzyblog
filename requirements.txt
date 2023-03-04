@@ -1,0 +1,5 @@
+fizzyblog==1.0
+Markdown==3.4.1
+Pygments==2.14.0
+python-markdown-math==0.8
+toml==0.10.2

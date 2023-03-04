@@ -8,5 +8,5 @@ setup(
 	license='GPLv3',
 	author='TheElectronWill',
 	description='Blog engine in python',
-	install_requires=['markdown', 'toml', 'python-markdown-math']
+	install_requires=['markdown', 'toml', 'python-markdown-math', 'pygments']
 )

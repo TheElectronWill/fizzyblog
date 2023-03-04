@@ -7,34 +7,40 @@ import fizzyblog.utils as utils
 
 if not os.path.isfile("config.toml"):
 	with open("config.toml", "w") as file:
-		file.write("[site]")
-		file.write("\ntitle = \"My fizzy blog\"")
-		file.write("\nauthor = \"me\"")
-		file.write("\nlanguages = [\"en\"]")
-		file.write("\ndate_format = \"%Y-%m-%d\"")
-		file.write("\nmax_listed_posts = 8")
-		file.write("\nmax_listed_taxos = 12")
-		file.write("\n\n")
-		file.write("[engine]")
-		file.write("\ninput = \"src\"")
-		file.write("\noutput = \"out\"")
-		file.write("\nextensions = [\"markdown.extensions.codehilite\", \"markdown.extensions.extra\",\"mdx_math\"]")
+		file.write((
+			'[site]'
+	    	'title = "My fizzy blog"'
+		    'author = "me"'
+		    'languages = ["en"]'
+		    'date_format = "%Y-%m-%d"'
+		    'max_listed_posts = 8'
+		    'max_listed_taxos = 12'
+		    ''
+		    '[engine]'
+		    'input = "src"'
+		    'output = "out"'
+		    'extensions = ["markdown.extensions.codehilite", "markdown.extensions.extra","mdx_math"]'
+		    'symlink_static_resources = true'
+		))
 
 config = toml.load("config.toml")
 
 # [site]
-site_title = config["site"]["title"]
-site_author = config["site"]["author"]
-site_langs = config["site"]["languages"]
+_site = config["site"]
+site_title = _site["title"]
+site_author = _site["author"]
+site_langs = _site["languages"]
 default_lang = site_langs[0]
-date_format = config["site"]["date_format"]
-max_listed_posts = config["site"]["max_listed_posts"]
-max_listed_taxos = config["site"]["max_listed_taxos"]
+date_format = _site["date_format"]
+max_listed_posts = _site["max_listed_posts"]
+max_listed_taxos = _site["max_listed_taxos"]
 
 # [engine]
-dir_input = config["engine"]["input"]
-dir_output = config["engine"]["output"]
-extensions = config["engine"]["extensions"]
+_engine = config["engine"]
+dir_input = _engine["input"]
+dir_output = _engine["output"]
+extensions = _engine["extensions"]
+symlink_static_resources = _engine["symlink_static_resources"]
 
 os.makedirs(f"{dir_input}/posts", exist_ok=True)
 os.makedirs(f"{dir_input}/pages", exist_ok=True)
