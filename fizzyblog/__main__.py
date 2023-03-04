@@ -163,6 +163,30 @@ if __name__ == "__main__":
 	base_dir = os.path.abspath(os.getcwd())
 	nposts = process_posts(base_dir)
 	npages = process_pages(base_dir)
+
+	# Copy or symlink static resources
+	print("Handling static resources")
+	out_static = f"{settings.dir_output}/static"
+	in_static = f"{settings.dir_input}/static"	
+	
+	if settings.symlink_static_resources:
+		if os.path.isdir(out_static) and not os.path.islink(out_static):
+			remove_dir(out_static)
+
+		# cd to the output dir, otherwise the relative symlink is wrong
+		absolute_in = os.path.abspath(in_static)
+		absolute_out = os.path.abspath(out_static)
+		os.chdir(settings.dir_output)
+		relative_in = os.path.relpath(absolute_in, os.getcwd())
+		relative_out = os.path.relpath(absolute_out, os.getcwd())
+		symlink_force(relative_in, relative_out)
+	else:
+		if os.path.islink(out_static):
+			os.remove(out_static)
+
+		remove_dir(out_static)
+		copy_dir(in_static, out_static)
+
 	t1 = time.perf_counter()
 	time = t1-t0
 	print(f"Done! {nposts} posts and {npages} markdown pages have been processed in {time:.2} seconds.")

@@ -44,6 +44,16 @@ def copy_dir(src: str, dest: str):
 
 def remove_dir(dir: str):
 	dirutils.remove_tree(dir)
+	
+def symlink_force(src: str, dst: str):
+	is_dir = os.path.isdir(src)
+	try:
+		os.symlink(src, dst, is_dir)
+		print(f"Created link {dst} -> {src}")
+	except FileExistsError as e:
+		os.remove(dst)
+		os.symlink(src, dst, is_dir)
+		print(f"Updated link {dst} -> {src}")
 
 def getlist(dict, key):
 	v = dict.get(key)
